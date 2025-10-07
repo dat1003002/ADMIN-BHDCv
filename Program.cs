@@ -47,6 +47,8 @@ builder.Services.AddScoped<IProductLTCTLService, ProductLTCTLService>();
 builder.Services.AddScoped<IProductLTCTLRepository, ProductLTCTLRepository>();
 builder.Services.AddScoped<IQuyCachCSCTLRepository, QuyCachCSCTLRepository>();
 builder.Services.AddScoped<IQuyCachCSCTLService, QuyCachCSCTLService>();
+builder.Services.AddScoped<IProductStandardRepository, ProductStandardRepository>();
+builder.Services.AddScoped<IProductStandardService, ProductStandardService>();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
