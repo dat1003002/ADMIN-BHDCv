@@ -49,6 +49,16 @@ builder.Services.AddScoped<IQuyCachCSCTLRepository, QuyCachCSCTLRepository>();
 builder.Services.AddScoped<IQuyCachCSCTLService, QuyCachCSCTLService>();
 builder.Services.AddScoped<IProductStandardRepository, ProductStandardRepository>();
 builder.Services.AddScoped<IProductStandardService, ProductStandardService>();
+builder.Services.AddScoped<IRawMaterialStandardRepository, RawMaterialStandardRepository>();
+builder.Services.AddScoped<IRawMaterialStandardService, RawMaterialStandardService>();
+builder.Services.AddScoped<ILaboratoryEquipmentF1Repository, LaboratoryEquipmentF1Repository>();
+builder.Services.AddScoped<ILaboratoryEquipmentF1Service, LaboratoryEquipmentF1Service>();
+builder.Services.AddScoped<ILaboratoryEquipmentF2Repository, LaboratoryEquipmentF2Repository>();
+builder.Services.AddScoped<ILaboratoryEquipmentF2Service, LaboratoryEquipmentF2Service>();
+builder.Services.AddScoped<IQCEmployeeF1Repository, QCEmployeeF1Repository>();
+builder.Services.AddScoped<IQCEmployeeF1Service, QCEmployeeF1Service>();
+builder.Services.AddScoped<IQCEmployeeF2Repository, QCEmployeeF2Repository>();
+builder.Services.AddScoped<IQCEmployeeF2Service, QCEmployeeF2Service>();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();

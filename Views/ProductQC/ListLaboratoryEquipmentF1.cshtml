@@ -1,0 +1,122 @@
+@model X.PagedList.IPagedList<AspnetCoreMvcFull.ModelDTO.Product.LaboratoryEquipmentF1DTO>
+   @using X.PagedList.Mvc.Core
+   @using X.PagedList
+
+   @{
+       ViewData["Title"] = "Laboratory Equipment F#1";
+   }
+
+   <div class="d-flex justify-content-between">
+       <a asp-controller="LaboratoryEquipmentF1" asp-action="CreateLaboratoryEquipmentF1" style="background: #428BCA; border: 1px solid #428BCA; color: white; padding: 6px; font-size: 14px; border-radius: 5px; text-decoration: none;">
+           Thêm Mới
+       </a>
+       <form asp-controller="LaboratoryEquipmentF1" asp-action="SearchLaboratoryEquipmentF1" method="get" style="display: flex; align-items: center; margin-right: 20px;">
+           <div style="display: inline-flex; border: 1px solid #ccc; border-radius: 2px; overflow: hidden;">
+               <input type="hidden" name="page" value="@Model.PageNumber" />
+               <input type="text" name="name" placeholder="Nhập tên hướng dẫn để tìm kiếm" style="border: none; padding: 5px 8px; font-size: 14px; width: 250px; height: 30px; outline: none;" required value="@TempData["SearchTerm"]" />
+               <button type="submit" style="padding: 5px 12px; background-color: #428BCA; color: white; border: none; cursor: pointer; font-size: 14px; height: 30px; outline: none;">
+                   Tìm kiếm
+               </button>
+           </div>
+       </form>
+   </div>
+
+   <div class="container mt-4">
+       @if (!Model.Any() && !string.IsNullOrEmpty(TempData["SearchTerm"]?.ToString()))
+       {
+           <div style="text-align: center; color: #B74635; font-size: 16px; margin-bottom: 20px;">
+               Không tìm thấy hướng dẫn nào với từ khóa "@TempData["SearchTerm"]".
+           </div>
+       }
+
+       <table class="table table-bordered">
+           <thead>
+               <tr>
+                   <th>Tên Hướng Dẫn</th>
+                   <th>Ảnh</th>
+                   <th>Hành Động</th>
+               </tr>
+           </thead>
+           <tbody>
+               @foreach (var item in Model)
+               {
+                   <tr>
+                       <td>@item.name</td>
+                       <td>
+                           @if (!string.IsNullOrEmpty(item.image))
+                           {
+                               <img src="@Url.Content("~/images/" + item.image)" style="width: 100px; height: 100px; object-fit: cover;" />
+                           }
+                       </td>
+                       <td>
+                           <a asp-action="EditLaboratoryEquipmentF1" asp-route-id="@item.ProductId" class="btn btn-primary btn-sm">Sửa</a>
+                           <button onclick="showProductDetails(@item.ProductId)" class="btn btn-info btn-sm">Xem</button>
+                           <button onclick="deleteProduct(@item.ProductId)" class="btn btn-danger btn-sm">Xóa</button>
+                       </td>
+                   </tr>
+               }
+           </tbody>
+       </table>
+
+       @Html.PagedListPager(Model, page => Url.Action("LaboratoryEquipmentF1", new { page }), new PagedListRenderOptions
+       {
+           LiElementClasses = new[] { "page-item" },
+           PageClasses = new[] { "page-link" },
+           DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+           DisplayLinkToNextPage = PagedListDisplayMode.Always,
+           MaximumPageNumbersToDisplay = 5
+       })
+
+       <div class="modal fade" id="modalScrollable" tabindex="-1" aria-labelledby="modalScrollableTitle" aria-hidden="true">
+           <div class="modal-dialog modal-dialog-scrollable" role="document" style="max-width: 100%; width: 100%; height: 100%; margin: 0;">
+               <div class="modal-content" style="height: 100%; border-radius: 0;">
+                   <div class="modal-header d-flex justify-content-center" style="background: red;">
+                       <h5 class="modal-title" style="color: white; font-size: 28px;">Chi Tiết Hướng Dẫn</h5>
+                   </div>
+                   <div class="modal-body" id="modalBody" style="text-align: center;"></div>
+                   <div class="modal-footer" style="background: red;">
+                       <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Đóng</button>
+                   </div>
+               </div>
+           </div>
+       </div>
+   </div>
+
+   <script>
+       function deleteProduct(productId) {
+           if (confirm("Bạn có chắc chắn muốn xóa hướng dẫn này không?")) {
+               $.ajax({
+                   url: '@Url.Action("DeleteLaboratoryEquipmentF1", "LaboratoryEquipmentF1")',
+                   type: 'POST',
+                   data: { productId: productId },
+                   success: function (result) {
+                       if (result.success) {
+                           alert(result.message);
+                           location.reload();
+                       } else {
+                           alert("Có lỗi xảy ra: " + result.message);
+                       }
+                   },
+                   error: function (xhr, status, error) {
+                       alert("Có lỗi xảy ra: " + xhr.responseText);
+                   }
+               });
+           }
+       }
+
+       function showProductDetails(productId) {
+           $.ajax({
+               url: '@Url.Action("ShowLaboratoryEquipmentF1", "LaboratoryEquipmentF1")',
+               type: 'GET',
+               data: { id: productId },
+               success: function (data) {
+                   $('#modalBody').html(data);
+                   $('#modalScrollable').modal('show');
+               },
+               error: function (xhr, status, error) {
+                   console.error(xhr);
+                   alert('Có lỗi xảy ra khi tải dữ liệu hướng dẫn.');
+               }
+           });
+       }
+   </script>
