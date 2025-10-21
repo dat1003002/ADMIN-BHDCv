@@ -12,7 +12,7 @@ namespace AspnetCoreMvcFull.Controllers
   public class QCEmployeeF2Controller : Controller
   {
     private readonly IQCEmployeeF2Service _qcEmployeeF2Service;
-    private const int CategoryId = 20; // QC Employee F#2 category
+    private const int CategoryId = 29; // QC Employee F#2 category
     private const int PageSize = 9;
 
     public QCEmployeeF2Controller(IQCEmployeeF2Service qcEmployeeF2Service)

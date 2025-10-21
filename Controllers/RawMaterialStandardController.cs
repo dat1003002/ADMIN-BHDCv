@@ -12,7 +12,7 @@ namespace AspnetCoreMvcFull.Controllers
   public class RawMaterialStandardController : Controller
   {
     private readonly IRawMaterialStandardService _rawMaterialStandardService;
-    private const int CategoryId = 16; // Raw Material Standard category
+    private const int CategoryId = 19; // Raw Material Standard category
     private const int PageSize = 9;
 
     public RawMaterialStandardController(IRawMaterialStandardService rawMaterialStandardService)

@@ -12,7 +12,7 @@ namespace AspnetCoreMvcFull.Controllers
   public class LaboratoryEquipmentF1Controller : Controller
   {
     private readonly ILaboratoryEquipmentF1Service _laboratoryEquipmentF1Service;
-    private const int CategoryId = 17; // Laboratory Equipment F#1 category
+    private const int CategoryId = 23; // Laboratory Equipment F#1 category
     private const int PageSize = 9;
 
     public LaboratoryEquipmentF1Controller(ILaboratoryEquipmentF1Service laboratoryEquipmentF1Service)

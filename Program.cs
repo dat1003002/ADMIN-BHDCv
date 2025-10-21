@@ -74,15 +74,15 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+app.UseHttpsRedirection();  
 app.UseStaticFiles();
 app.MapRazorPages();
 app.UseRouting();
 
 app.UseAuthorization();
-
+   
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Dashboards}/{action=Index}/{id?}");
 
-app.Run();
+ app.Run();
