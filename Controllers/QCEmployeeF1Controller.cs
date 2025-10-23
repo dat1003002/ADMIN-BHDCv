@@ -24,7 +24,7 @@ namespace AspnetCoreMvcFull.Controllers
     public async Task<IActionResult> QCEmployeeF1(int page = 1)
     {
       var products = await _qcEmployeeF1Service.GetProducts(CategoryId, page, PageSize);
-      TempData["SearchTerm"] = null;
+      ViewData["SearchTerm"] = null; // Xóa SearchTerm khi hiển thị danh sách đầy đủ (thay TempData để khớp view)
       return View("~/Views/ProductQC/ListQCEmployeeF1.cshtml", products);
     }
 
@@ -36,6 +36,7 @@ namespace AspnetCoreMvcFull.Controllers
         return RedirectToAction(nameof(QCEmployeeF1));
       }
       var products = await _qcEmployeeF1Service.SearchProductsByNameAsync(name, CategoryId, page, PageSize);
+      ViewData["SearchTerm"] = name; // Thêm ViewData để view sử dụng cho input và pagination (sửa lỗi chính)
       TempData["SearchTerm"] = name;
       TempData.Keep("SearchTerm");
       return View("~/Views/ProductQC/ListQCEmployeeF1.cshtml", products);
