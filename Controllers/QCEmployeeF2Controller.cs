@@ -24,7 +24,7 @@ namespace AspnetCoreMvcFull.Controllers
     public async Task<IActionResult> QCEmployeeF2(int page = 1)
     {
       var products = await _qcEmployeeF2Service.GetProducts(CategoryId, page, PageSize);
-      TempData["SearchTerm"] = null;
+      ViewData["SearchTerm"] = null; // Xóa SearchTerm khi hiển thị danh sách đầy đủ
       return View("~/Views/ProductQC/ListQCEmployeeF2.cshtml", products);
     }
 
@@ -36,6 +36,7 @@ namespace AspnetCoreMvcFull.Controllers
         return RedirectToAction(nameof(QCEmployeeF2));
       }
       var products = await _qcEmployeeF2Service.SearchProductsByNameAsync(name, CategoryId, page, PageSize);
+      ViewData["SearchTerm"] = name; // Thêm ViewData để view sử dụng cho input và pagination
       TempData["SearchTerm"] = name;
       TempData.Keep("SearchTerm");
       return View("~/Views/ProductQC/ListQCEmployeeF2.cshtml", products);
@@ -55,40 +56,40 @@ namespace AspnetCoreMvcFull.Controllers
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateQCEmployeeF2(QCEmployeeF2DTO product)
     {
-      if (!ModelState.IsValid)
+      if (ModelState.IsValid)
       {
-        var categories = await _qcEmployeeF2Service.GetCategories();
-        ViewBag.CategoryList = new SelectList(categories.Where(c => c.CategoryId == CategoryId), "CategoryId", "CategoryName");
-        return View("~/Views/ProductQC/CreateQCEmployeeF2.cshtml", product);
+        if (product.imageFile != null && product.imageFile.Length > 0)
+        {
+          var fileName = Path.GetFileName(product.imageFile.FileName);
+          var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+          if (!Directory.Exists(directoryPath))
+          {
+            Directory.CreateDirectory(directoryPath);
+          }
+          var filePath = Path.Combine(directoryPath, fileName);
+          if (System.IO.File.Exists(filePath))
+          {
+            string newFileName = Path.GetFileNameWithoutExtension(fileName) + "_" + Guid.NewGuid() + Path.GetExtension(fileName);
+            filePath = Path.Combine(directoryPath, newFileName);
+            product.image = newFileName;
+          }
+          else
+          {
+            product.image = fileName;
+          }
+          using (var stream = new FileStream(filePath, FileMode.Create))
+          {
+            await product.imageFile.CopyToAsync(stream);
+          }
+        }
+        await _qcEmployeeF2Service.AddProductAsync(product);
+        return RedirectToAction(nameof(QCEmployeeF2));
       }
 
-      if (product.imageFile != null && product.imageFile.Length > 0)
-      {
-        var fileName = Path.GetFileName(product.imageFile.FileName);
-        var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
-        if (!Directory.Exists(directoryPath))
-        {
-          Directory.CreateDirectory(directoryPath);
-        }
-        var filePath = Path.Combine(directoryPath, fileName);
-        if (System.IO.File.Exists(filePath))
-        {
-          string newFileName = Path.GetFileNameWithoutExtension(fileName) + "_" + Guid.NewGuid() + Path.GetExtension(fileName);
-          filePath = Path.Combine(directoryPath, newFileName);
-          product.image = newFileName;
-        }
-        else
-        {
-          product.image = fileName;
-        }
-        using (var stream = new FileStream(filePath, FileMode.Create))
-        {
-          await product.imageFile.CopyToAsync(stream);
-        }
-      }
-
-      await _qcEmployeeF2Service.AddProductAsync(product);
-      return RedirectToAction(nameof(QCEmployeeF2));
+      var categories = await _qcEmployeeF2Service.GetCategories();
+      var filteredCategories = categories.Where(c => c.CategoryId == CategoryId).ToList();
+      ViewBag.CategoryList = new SelectList(filteredCategories, "CategoryId", "CategoryName");
+      return View("~/Views/ProductQC/CreateQCEmployeeF2.cshtml", product);
     }
 
     // GET: /QCEmployeeF2/EditQCEmployeeF2
@@ -99,8 +100,10 @@ namespace AspnetCoreMvcFull.Controllers
       {
         return NotFound();
       }
+
       var categories = await _qcEmployeeF2Service.GetCategories();
-      ViewBag.CategoryList = new SelectList(categories.Where(c => c.CategoryId == CategoryId), "CategoryId", "CategoryName");
+      var filteredCategories = categories.Where(c => c.CategoryId == CategoryId).ToList();
+      ViewBag.CategoryList = new SelectList(filteredCategories, "CategoryId", "CategoryName", product.CategoryId);
       return View("~/Views/ProductQC/EditQCEmployeeF2.cshtml", product);
     }
 
@@ -109,50 +112,51 @@ namespace AspnetCoreMvcFull.Controllers
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditQCEmployeeF2(QCEmployeeF2DTO product)
     {
-      if (!ModelState.IsValid)
+      if (ModelState.IsValid)
       {
-        var categories = await _qcEmployeeF2Service.GetCategories();
-        ViewBag.CategoryList = new SelectList(categories.Where(c => c.CategoryId == CategoryId), "CategoryId", "CategoryName");
-        return View("~/Views/ProductQC/EditQCEmployeeF2.cshtml", product);
-      }
-
-      var existingProduct = await _qcEmployeeF2Service.GetProductByIdAsync(product.ProductId);
-      if (existingProduct == null)
-      {
-        return NotFound();
-      }
-
-      if (product.imageFile != null && product.imageFile.Length > 0)
-      {
-        var fileName = Path.GetFileName(product.imageFile.FileName);
-        var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
-        if (!Directory.Exists(directoryPath))
+        var existingProduct = await _qcEmployeeF2Service.GetProductByIdAsync(product.ProductId);
+        if (existingProduct == null)
         {
-          Directory.CreateDirectory(directoryPath);
+          return NotFound();
         }
-        var filePath = Path.Combine(directoryPath, fileName);
-        if (System.IO.File.Exists(filePath))
+
+        if (product.imageFile != null && product.imageFile.Length > 0)
         {
-          string newFileName = Path.GetFileNameWithoutExtension(fileName) + "_" + Guid.NewGuid() + Path.GetExtension(fileName);
-          filePath = Path.Combine(directoryPath, newFileName);
-          product.image = newFileName;
+          var fileName = Path.GetFileName(product.imageFile.FileName);
+          var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+          if (!Directory.Exists(directoryPath))
+          {
+            Directory.CreateDirectory(directoryPath);
+          }
+          var filePath = Path.Combine(directoryPath, fileName);
+          if (System.IO.File.Exists(filePath))
+          {
+            string newFileName = Path.GetFileNameWithoutExtension(fileName) + "_" + Guid.NewGuid() + Path.GetExtension(fileName);
+            filePath = Path.Combine(directoryPath, newFileName);
+            product.image = newFileName;
+          }
+          else
+          {
+            product.image = fileName;
+          }
+          using (var stream = new FileStream(filePath, FileMode.Create))
+          {
+            await product.imageFile.CopyToAsync(stream);
+          }
         }
         else
         {
-          product.image = fileName;
+          product.image = existingProduct.image;
         }
-        using (var stream = new FileStream(filePath, FileMode.Create))
-        {
-          await product.imageFile.CopyToAsync(stream);
-        }
-      }
-      else
-      {
-        product.image = existingProduct.image;
+
+        await _qcEmployeeF2Service.UpdateProductAsync(product);
+        return RedirectToAction(nameof(QCEmployeeF2));
       }
 
-      await _qcEmployeeF2Service.UpdateProductAsync(product);
-      return RedirectToAction(nameof(QCEmployeeF2));
+      var categories = await _qcEmployeeF2Service.GetCategories();
+      var filteredCategories = categories.Where(c => c.CategoryId == CategoryId).ToList();
+      ViewBag.CategoryList = new SelectList(filteredCategories, "CategoryId", "CategoryName", product.CategoryId);
+      return View("~/Views/ProductQC/EditQCEmployeeF2.cshtml", product);
     }
 
     // POST: /QCEmployeeF2/DeleteQCEmployeeF2
