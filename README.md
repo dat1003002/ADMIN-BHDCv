@@ -191,8 +191,19 @@ If you want to [Download Free Admin Templates](https://themeselection.com/item/c
 - [Instagram](https://www.instagram.com/themeselection/)
 - [Discord](https://discord.gg/kBHkY7DekX)
 - [YouTube](https://www.youtube.com/channel/UCuryo5s0CW4aP83itLjIdZg)
-#   A D M I N  
- #   A D M I N - D R B V N  
- #   A D M I N - B H D C v  
- #   A D M I N - B H D C v  
+#   A D M I N 
  
+ #   A D M I N - D R B V N 
+ 
+ #   A D M I N - B H D C v 
+ 
+ #   A D M I N - B H D C v 
+ 
+ 
+
+User :
+Server=DESKTOP-KHC46R2\\SQLEXPRESS2;Database=Admin-Drbvn;User Id=sa;Password=drbvnit;TrustServerCertificate=True;MultipleActiveResultSets=true
+
+
+Main
+Server=DESKTOP-GSG5CS2\\SQLEXPRESS;Database=Admin-Drbvn;User Id=sa;Password=drbvnit;TrustServerCertificate=True;MultipleActiveResultSets=true
