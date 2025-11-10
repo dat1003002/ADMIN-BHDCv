@@ -107,7 +107,7 @@
                 </li>
             </ul>
         </li>
-        <li class='menu-item@(currentPage.StartsWith("/ProductStandard") || currentPage.StartsWith("/RawMaterialStandard") || currentPage.StartsWith("/LaboratoryEquipmentF1") || currentPage.StartsWith("/LaboratoryEquipmentF2") || currentPage.StartsWith("/QCEmployeeF1") || currentPage.StartsWith("/QCEmployeeF2") ? " active open" : "")'>
+        <li class='menu-item@(currentPage.StartsWith("/ProductStandard") || currentPage.StartsWith("/RawMaterialStandard") || currentPage.StartsWith("/LaboratoryEquipmentF1Controller") || currentPage.StartsWith("/LaboratoryEquipmentF2") || currentPage.StartsWith("/QCEmployeeF1") || currentPage.StartsWith("/QCEmployeeF2") ? " active open" : "")'>
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class='menu-icon bx bx-check-circle'></i>
                 <div>Bộ Phận QC</div>
@@ -124,9 +124,7 @@
                     </a>
                 </li>
                 <li class='menu-item@(currentPage == "/LaboratoryEquipmentF1/LaboratoryEquipmentF1" ? " active" : "")'>
-                    <a asp-controller="LaboratoryEquipmentF1" asp-action="LaboratoryEquipmentF1" class="menu-link">
-                        <div>Lab Equipment F#1</div>
-                    </a>
+                    <a asp-controller="LaboratoryEquipmentF1" asp-action="LaboratoryEquipmentF1" class="menu-link">Lab Equipment F#1</a>
                 </li>
                 <li class='menu-item@(currentPage == "/LaboratoryEquipmentF2/LaboratoryEquipmentF2" ? " active" : "")'>
                     <a asp-controller="LaboratoryEquipmentF2" asp-action="LaboratoryEquipmentF2" class="menu-link">

@@ -12,7 +12,6 @@ namespace AspnetCoreMvcFull.Controllers
   public class LaboratoryEquipmentF1Controller : Controller
   {
     private readonly ILaboratoryEquipmentF1Service _laboratoryEquipmentF1Service;
-    private const int CategoryId = 23; // Laboratory Equipment F#1 category
     private const int PageSize = 9;
 
     public LaboratoryEquipmentF1Controller(ILaboratoryEquipmentF1Service laboratoryEquipmentF1Service)
@@ -20,37 +19,80 @@ namespace AspnetCoreMvcFull.Controllers
       _laboratoryEquipmentF1Service = laboratoryEquipmentF1Service;
     }
 
-    // GET: /LaboratoryEquipmentF1/LaboratoryEquipmentF1
+    // F#1 - Thẻ Lý Lịch
     public async Task<IActionResult> LaboratoryEquipmentF1(int page = 1)
     {
-      var products = await _laboratoryEquipmentF1Service.GetProducts(CategoryId, page, PageSize);
+      int categoryId = 23;
+      var products = await _laboratoryEquipmentF1Service.GetProducts(categoryId, page, PageSize);
+      ViewBag.CurrentAction = "LaboratoryEquipmentF1";
       TempData["SearchTerm"] = null;
       return View("~/Views/ProductQC/ListLaboratoryEquipmentF1.cshtml", products);
     }
 
-    // GET: /LaboratoryEquipmentF1/SearchLaboratoryEquipmentF1
-    public async Task<IActionResult> SearchLaboratoryEquipmentF1(string name, int page = 1)
+    // F#2 - Kết Quả Hiệu Chuẩn
+    public async Task<IActionResult> LabEquipF1Ketquahieuchuan(int page = 1)
+    {
+      int categoryId = 24;
+      var products = await _laboratoryEquipmentF1Service.GetProducts(categoryId, page, PageSize);
+      ViewBag.CurrentAction = "LabEquipF1Ketquahieuchuan";
+      TempData["SearchTerm"] = null;
+      return View("~/Views/ProductQC/ListLabEquipF1Ketquahieuchuan.cshtml", products);
+    }
+
+    // F#3 - Tiêu Chuẩn Kiểm Tra
+    public async Task<IActionResult> LabEquipF1DailyCheck(int page = 1)
+    {
+      int categoryId = 25;
+      var products = await _laboratoryEquipmentF1Service.GetProducts(categoryId, page, PageSize);
+      ViewBag.CurrentAction = "LabEquipF1DailyCheck";
+      TempData["SearchTerm"] = null;
+      return View("~/Views/ProductQC/LabEquipF1DailyCheck.cshtml", products);
+    }
+
+    // Tìm kiếm
+    public async Task<IActionResult> SearchLaboratoryEquipmentF1(string name, int categoryId = 23, int page = 1)
     {
       if (string.IsNullOrEmpty(name))
       {
-        return RedirectToAction(nameof(LaboratoryEquipmentF1));
+        return RedirectToAction(categoryId switch
+        {
+          23 => "LaboratoryEquipmentF1",
+          24 => "LabEquipF1Ketquahieuchuan",
+          25 => "LabEquipF1DailyCheck",
+          _ => "LaboratoryEquipmentF1"
+        });
       }
-      var products = await _laboratoryEquipmentF1Service.SearchProductsByNameAsync(name, CategoryId, page, PageSize);
+
+      var products = await _laboratoryEquipmentF1Service.SearchProductsByNameAsync(name, categoryId, page, PageSize);
       TempData["SearchTerm"] = name;
       TempData.Keep("SearchTerm");
-      return View("~/Views/ProductQC/ListLaboratoryEquipmentF1.cshtml", products);
+
+      ViewBag.CurrentAction = categoryId switch
+      {
+        23 => "LaboratoryEquipmentF1",
+        24 => "LabEquipF1Ketquahieuchuan",
+        25 => "LabEquipF1DailyCheck",
+        _ => "LaboratoryEquipmentF1"
+      };
+
+      return View(categoryId switch
+      {
+        23 => "~/Views/ProductQC/ListLaboratoryEquipmentF1.cshtml",
+        24 => "~/Views/ProductQC/ListLabEquipF1Ketquahieuchuan.cshtml",
+        25 => "~/Views/ProductQC/LabEquipF1DailyCheck.cshtml",
+        _ => "~/Views/ProductQC/ListLaboratoryEquipmentF1.cshtml"
+      }, products);
     }
 
-    // GET: /LaboratoryEquipmentF1/CreateLaboratoryEquipmentF1
+    // Create
     public async Task<IActionResult> CreateLaboratoryEquipmentF1()
     {
       var categories = await _laboratoryEquipmentF1Service.GetCategories();
-      var filteredCategories = categories.Where(c => c.CategoryId == CategoryId).ToList();
-      ViewBag.CategoryList = new SelectList(filteredCategories, "CategoryId", "CategoryName");
+      var filtered = categories.Where(c => c.CategoryId == 23 || c.CategoryId == 24 || c.CategoryId == 25).ToList();
+      ViewBag.CategoryList = new SelectList(filtered, "CategoryId", "CategoryName");
       return View("~/Views/ProductQC/CreateLaboratoryEquipmentF1.cshtml");
     }
 
-    // POST: /LaboratoryEquipmentF1/CreateLaboratoryEquipmentF1
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateLaboratoryEquipmentF1(LaboratoryEquipmentF1DTO product)
@@ -58,7 +100,7 @@ namespace AspnetCoreMvcFull.Controllers
       if (!ModelState.IsValid)
       {
         var categories = await _laboratoryEquipmentF1Service.GetCategories();
-        ViewBag.CategoryList = new SelectList(categories.Where(c => c.CategoryId == CategoryId), "CategoryId", "CategoryName");
+        ViewBag.CategoryList = new SelectList(categories.Where(c => c.CategoryId == 23 || c.CategoryId == 24 || c.CategoryId == 25), "CategoryId", "CategoryName");
         return View("~/Views/ProductQC/CreateLaboratoryEquipmentF1.cshtml", product);
       }
 
@@ -66,21 +108,14 @@ namespace AspnetCoreMvcFull.Controllers
       {
         var fileName = Path.GetFileName(product.imageFile.FileName);
         var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
-        if (!Directory.Exists(directoryPath))
-        {
-          Directory.CreateDirectory(directoryPath);
-        }
+        if (!Directory.Exists(directoryPath)) Directory.CreateDirectory(directoryPath);
         var filePath = Path.Combine(directoryPath, fileName);
         if (System.IO.File.Exists(filePath))
         {
-          string newFileName = Path.GetFileNameWithoutExtension(fileName) + "_" + Guid.NewGuid() + Path.GetExtension(fileName);
-          filePath = Path.Combine(directoryPath, newFileName);
-          product.image = newFileName;
+          fileName = Path.GetFileNameWithoutExtension(fileName) + "_" + Guid.NewGuid() + Path.GetExtension(fileName);
+          filePath = Path.Combine(directoryPath, fileName);
         }
-        else
-        {
-          product.image = fileName;
-        }
+        product.image = fileName;
         using (var stream = new FileStream(filePath, FileMode.Create))
         {
           await product.imageFile.CopyToAsync(stream);
@@ -88,23 +123,28 @@ namespace AspnetCoreMvcFull.Controllers
       }
 
       await _laboratoryEquipmentF1Service.AddProductAsync(product);
-      return RedirectToAction(nameof(LaboratoryEquipmentF1));
+      return RedirectToAction(product.CategoryId switch
+      {
+        23 => "LaboratoryEquipmentF1",
+        24 => "LabEquipF1Ketquahieuchuan",
+        25 => "LabEquipF1DailyCheck",
+        _ => "LaboratoryEquipmentF1"
+      });
     }
 
-    // GET: /LaboratoryEquipmentF1/EditLaboratoryEquipmentF1
+    // Edit
     public async Task<IActionResult> EditLaboratoryEquipmentF1(int id)
     {
       var product = await _laboratoryEquipmentF1Service.GetProductByIdAsync(id);
-      if (product == null)
-      {
-        return NotFound();
-      }
+      if (product == null) return NotFound();
+
       var categories = await _laboratoryEquipmentF1Service.GetCategories();
-      ViewBag.CategoryList = new SelectList(categories.Where(c => c.CategoryId == CategoryId), "CategoryId", "CategoryName");
+      var filtered = categories.Where(c => c.CategoryId == 23 || c.CategoryId == 24 || c.CategoryId == 25);
+      ViewBag.CategoryList = new SelectList(filtered, "CategoryId", "CategoryName", product.CategoryId);
+
       return View("~/Views/ProductQC/EditLaboratoryEquipmentF1.cshtml", product);
     }
 
-    // POST: /LaboratoryEquipmentF1/EditLaboratoryEquipmentF1
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditLaboratoryEquipmentF1(LaboratoryEquipmentF1DTO product)
@@ -112,35 +152,25 @@ namespace AspnetCoreMvcFull.Controllers
       if (!ModelState.IsValid)
       {
         var categories = await _laboratoryEquipmentF1Service.GetCategories();
-        ViewBag.CategoryList = new SelectList(categories.Where(c => c.CategoryId == CategoryId), "CategoryId", "CategoryName");
+        ViewBag.CategoryList = new SelectList(categories.Where(c => c.CategoryId == 23 || c.CategoryId == 24 || c.CategoryId == 25), "CategoryId", "CategoryName");
         return View("~/Views/ProductQC/EditLaboratoryEquipmentF1.cshtml", product);
       }
 
-      var existingProduct = await _laboratoryEquipmentF1Service.GetProductByIdAsync(product.ProductId);
-      if (existingProduct == null)
-      {
-        return NotFound();
-      }
+      var existing = await _laboratoryEquipmentF1Service.GetProductByIdAsync(product.ProductId);
+      if (existing == null) return NotFound();
 
       if (product.imageFile != null && product.imageFile.Length > 0)
       {
         var fileName = Path.GetFileName(product.imageFile.FileName);
         var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
-        if (!Directory.Exists(directoryPath))
-        {
-          Directory.CreateDirectory(directoryPath);
-        }
+        if (!Directory.Exists(directoryPath)) Directory.CreateDirectory(directoryPath);
         var filePath = Path.Combine(directoryPath, fileName);
         if (System.IO.File.Exists(filePath))
         {
-          string newFileName = Path.GetFileNameWithoutExtension(fileName) + "_" + Guid.NewGuid() + Path.GetExtension(fileName);
-          filePath = Path.Combine(directoryPath, newFileName);
-          product.image = newFileName;
+          fileName = Path.GetFileNameWithoutExtension(fileName) + "_" + Guid.NewGuid() + Path.GetExtension(fileName);
+          filePath = Path.Combine(directoryPath, fileName);
         }
-        else
-        {
-          product.image = fileName;
-        }
+        product.image = fileName;
         using (var stream = new FileStream(filePath, FileMode.Create))
         {
           await product.imageFile.CopyToAsync(stream);
@@ -148,33 +178,36 @@ namespace AspnetCoreMvcFull.Controllers
       }
       else
       {
-        product.image = existingProduct.image;
+        product.image = existing.image;
       }
 
       await _laboratoryEquipmentF1Service.UpdateProductAsync(product);
-      return RedirectToAction(nameof(LaboratoryEquipmentF1));
+      return RedirectToAction(product.CategoryId switch
+      {
+        23 => "LaboratoryEquipmentF1",
+        24 => "LabEquipF1Ketquahieuchuan",
+        25 => "LabEquipF1DailyCheck",
+        _ => "LaboratoryEquipmentF1"
+      });
     }
 
-    // POST: /LaboratoryEquipmentF1/DeleteLaboratoryEquipmentF1
+    // Xóa
     [HttpPost]
     public async Task<IActionResult> DeleteLaboratoryEquipmentF1(int productId)
     {
       if (productId <= 0)
       {
-        return BadRequest("Invalid Product ID.");
+        return Json(new { success = false, message = "ID không hợp lệ." });
       }
       await _laboratoryEquipmentF1Service.DeleteProductAsync(productId);
-      return Json(new { success = true, message = "Hướng dẫn đã được xóa thành công!" });
+      return Json(new { success = true, message = "Xóa thành công!" });
     }
 
-    // GET: /LaboratoryEquipmentF1/ShowLaboratoryEquipmentF1
+    // Chi tiết
     public async Task<IActionResult> ShowLaboratoryEquipmentF1(int id)
     {
       var product = await _laboratoryEquipmentF1Service.GetProductByIdAsync(id);
-      if (product == null)
-      {
-        return NotFound();
-      }
+      if (product == null) return NotFound();
       return PartialView("~/Views/ProductQC/ShowLaboratoryEquipmentF1.cshtml", product);
     }
   }

@@ -9,16 +9,22 @@
     <div class="nav-align-top">
         <ul class="nav nav-pills flex-column flex-md-row mb-6">
             <li class="nav-item me-1">
-                <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "ListCaoSuCTL" ? "active" : "")"
-                   asp-controller="CaoSuCTLCotroller" asp-action="ListCaoSuCTL">Thẻ lý lịch thiết bị</a>
+                <a class="nav-link @(ViewBag.CurrentAction == "LaboratoryEquipmentF1" ? "active" : "")"
+                   asp-controller="LaboratoryEquipmentF1"
+                   asp-action="LaboratoryEquipmentF1">
+                    Thẻ Lý Lịch Thiết Bị
+                </a>
             </li>
             <li class="nav-item me-1">
-                <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "ListQuyCachCSDCTL" ? "active" : "")"
-                   asp-controller="QuyCachCaoSuCTL" asp-action="ListQuyCachCSDCTL">Kết quả hiệu chuẩn</a>
+                <a class="nav-link @(ViewBag.CurrentAction == "LabEquipF1Ketquahieuchuan" ? "active" : "")"
+                   asp-controller="LaboratoryEquipmentF1"
+                   asp-action="LabEquipF1Ketquahieuchuan">
+                    Kết Quả Hiệu Chuẩn
+                </a>
             </li>
             <li class="nav-item me-1">
-                <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "ListQuyCachCSDCTL" ? "active" : "")"
-                   asp-controller="QuyCachCaoSuCTL" asp-action="ListQuyCachCSDCTL">Tiêu chuẩn kiểm tra hằng ngày</a>
+                <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "ListLabEquipF1DailyCheck" ? "active" : "")"
+                   asp-controller="LaboratoryEquipmentF1Controller" asp-action="ListLabEquipF1DailyCheck">Tiêu Chuẩn Kiểm Tra Hằng Ngày</a>
             </li>
         </ul>
     </div>

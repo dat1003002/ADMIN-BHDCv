@@ -32,6 +32,7 @@ namespace AspnetCoreMvcFull.Controllers
       }
       return View("~/Views/ProductCTL/ListTieuChuanCTL.cshtml", products);
     }
+
     [HttpPost]
     public async Task<IActionResult> Search(string name, int page = 1)
     {

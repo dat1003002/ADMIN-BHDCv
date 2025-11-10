@@ -22,6 +22,21 @@ namespace AspnetCoreMvcFull.Controllers
       ViewBag.CurrentAction = "ListCaoSuDun"; // Thiết lập action hiện tại
       return View("~/Views/ProductMhe/ListCaoSuDun.cshtml", products);
     }
+
+    public async Task<IActionResult> ListCaoSuDun250()
+    {
+      const int categoryId = 6;
+      IEnumerable<ProductCSDDTO> products = await _productCSDService.GetProducts(categoryId);
+      ViewBag.CurrentAction = "ListCaoSuDun250"; // Thiết lập action hiện tại
+      return View("~/Views/ProductMhe/ListCaoSuDun250.cshtml", products);
+    }
+    public async Task<IActionResult> ListCaoSuDun200ctl()
+    {
+      const int categoryId = 14;
+      IEnumerable<ProductCSDDTO> products = await _productCSDService.GetProducts(categoryId);
+      ViewBag.CurrentAction = "ListCaoSuDun200ctl"; // Thiết lập action hiện tại
+      return View("~/Views/ProductMhe/ListCaoSuDun200#3.cshtml", products);
+    }
     public async Task<IActionResult> CreateProductCSD()
     {
       var categories = await _productCSDService.GetCategories();
@@ -85,25 +100,12 @@ namespace AspnetCoreMvcFull.Controllers
     public async Task<IActionResult> showProductCSDById(int id)
     {
       var product = await _productCSDService.GetProductByIdAsync(id);
-      if (product == null) 
+      if (product == null)
       {
         return NotFound();
       }
       return PartialView("~/Views/ProductMhe/ProductModalCSD.cshtml", product);
     }
-    public async Task<IActionResult> ListCaoSuDun250()
-    {
-      const int categoryId = 6;
-      IEnumerable<ProductCSDDTO> products = await _productCSDService.GetProducts(categoryId);
-      ViewBag.CurrentAction = "ListCaoSuDun250"; // Thiết lập action hiện tại
-      return View("~/Views/ProductMhe/ListCaoSuDun250.cshtml", products);
-    }
-    public async Task<IActionResult> ListCaoSuDun200ctl()
-    {
-      const int categoryId = 14;
-      IEnumerable<ProductCSDDTO> products = await _productCSDService.GetProducts(categoryId);
-      ViewBag.CurrentAction = "ListCaoSuDun200ctl"; // Thiết lập action hiện tại
-      return View("~/Views/ProductMhe/ListCaoSuDun200#3.cshtml", products);
-    }
+    
   }
 }

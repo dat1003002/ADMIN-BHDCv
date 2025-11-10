@@ -1,0 +1,152 @@
+@model X.PagedList.IPagedList<AspnetCoreMvcFull.ModelDTO.Product.LaboratoryEquipmentF1DTO>
+@using X.PagedList.Mvc.Core
+@using X.PagedList
+
+@{
+    ViewData["Title"] = "Kết Quả Hiệu Chuẩn";
+    Layout = "~/Views/Shared/_ContentNavbarLayout.cshtml";
+}
+
+<style>
+    .nav-pills .nav-link.active {
+        background-color: #dc3545 !important;
+        color: white !important;
+    }
+</style>
+
+<!-- TAB ĐIỀU HƯỚNG -->
+<div class="nav-align-top">
+    <ul class="nav nav-pills flex-column flex-md-row mb-6">
+        <li class="nav-item me-1">
+            <a class="nav-link @(ViewBag.CurrentAction == "LaboratoryEquipmentF1" ? "active" : "")"
+               asp-controller="LaboratoryEquipmentF1" asp-action="LaboratoryEquipmentF1">
+                Thẻ Lý Lịch Thiết Bị
+            </a>
+        </li>
+        <li class="nav-item me-1">
+            <a class="nav-link @(ViewBag.CurrentAction == "LabEquipF1Ketquahieuchuan" ? "active" : "")"
+               asp-controller="LaboratoryEquipmentF1" asp-action="LabEquipF1Ketquahieuchuan">
+                Kết Quả Hiệu Chuẩn
+            </a>
+        </li>
+        <li class="nav-item me-1">
+            <a class="nav-link @(ViewBag.CurrentAction == "LabEquipF1DailyCheck" ? "active" : "")"
+               asp-controller="LaboratoryEquipmentF1" asp-action="LabEquipF1DailyCheck">
+                Tiêu Chuẩn Kiểm Tra Hằng Ngày
+            </a>
+        </li>
+    </ul>
+</div>
+
+<!-- NÚT THÊM MỚI + TÌM KIẾM -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <a asp-controller="LaboratoryEquipmentF1" asp-action="CreateLaboratoryEquipmentF1" class="btn btn-primary">Thêm Mới</a>
+    <form asp-controller="LaboratoryEquipmentF1" asp-action="SearchLaboratoryEquipmentF1" method="get">
+        <input type="hidden" name="categoryId" value="24" />
+        <div style="display: inline-flex; border: 1px solid #ccc; border-radius: 2px; overflow: hidden;">
+            <input type="text" name="name" placeholder="Tìm kiếm kết quả hiệu chuẩn..." value="@ViewData["SearchTerm"]"
+                   style="border: none; padding: 5px 8px; font-size: 14px; width: 250px; height: 30px; outline: none;" />
+            <button type="submit" style="padding: 5px 12px; background-color: #428BCA; color: white; border: none; cursor: pointer; font-size: 14px; height: 30px;">
+                Tìm kiếm
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- DANH SÁCH DẠNG THẺ -->
+<div class="row">
+    @if (Model.Any())
+    {
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">@item.name</h5>
+                        <div class="text-center mb-3">
+                            @if (!string.IsNullOrEmpty(item.image))
+                            {
+                                <img src="@Url.Content("~/images/" + item.image)" style="max-width: 100%; max-height: 200px; object-fit: cover;" alt="Ảnh" />
+                            }
+                            else
+                            {
+                                <span>Chưa có ảnh</span>
+                            }
+                        </div>
+                        <div class="d-flex justify-content-around">
+                            <a asp-action="EditLaboratoryEquipmentF1" asp-route-id="@item.ProductId" class="btn btn-sm btn-warning">Sửa</a>
+                            <button class="btn btn-sm btn-danger delete-btn" data-id="@item.ProductId">Xóa</button>
+                            <button class="btn btn-sm btn-info details-btn" data-id="@item.ProductId">Chi Tiết</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12 text-center">
+            <p>Không tìm thấy kết quả hiệu chuẩn nào.</p>
+        </div>
+    }
+</div>
+
+<!-- PHÂN TRANG -->
+@Html.PagedListPager(Model, page => Url.Action("LabEquipF1Ketquahieuchuan", new { page, name = ViewData["SearchTerm"] }),
+new PagedListRenderOptions
+{
+    UlElementClasses = new[] { "pagination", "justify-content-center" },
+    LiElementClasses = new[] { "page-item" },
+    PageClasses = new[] { "page-link" }
+})
+
+<!-- MODAL CHI TIẾT -->
+<div class="modal fade" id="modalScrollable" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable" style="max-width: 100%; width: 100%; height: 100%; margin: 0;">
+        <div class="modal-content" style="height: 100%; border-radius: 0;">
+            <div class="modal-header" style="background: red; justify-content: center;">
+                <h5 class="modal-title" style="color: white;">Chi Tiết Hiệu Chuẩn</h5>
+            </div>
+            <div class="modal-body" id="modalBody" style="text-align: center;"></div>
+            <div class="modal-footer" style="background: red;">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.delete-btn').click(function () {
+                if (confirm("Xóa kết quả này?")) {
+                    $.ajax({
+                        url: '@Url.Action("DeleteLaboratoryEquipmentF1", "LaboratoryEquipmentF1")',
+                        type: 'POST',
+                        data: { productId: $(this).data('id') },
+                        success: function (result) {
+                            if (result.success) {
+                                alert(result.message);
+                                location.reload();
+                            } else {
+                                alert(result.message);
+                            }
+                        }
+                    });
+                }
+            });
+
+            $('.details-btn').click(function () {
+                $.ajax({
+                    url: '@Url.Action("ShowLaboratoryEquipmentF1", "LaboratoryEquipmentF1")',
+                    type: 'GET',
+                    data: { id: $(this).data('id') },
+                    success: function (data) {
+                        $('#modalBody').html(data);
+                        $('#modalScrollable').modal('show');
+                    }
+                });
+            });
+        });
+    </script>
+}
