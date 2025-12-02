@@ -10,54 +10,21 @@ namespace AspnetCoreMvcFull.Service
 {
   public class LaboratoryEquipmentF1Service : ILaboratoryEquipmentF1Service
   {
-    private readonly ILaboratoryEquipmentF1Repository _laboratoryEquipmentF1Repository;
+    private readonly ILaboratoryEquipmentF1Repository _repo;
 
-    public LaboratoryEquipmentF1Service(ILaboratoryEquipmentF1Repository laboratoryEquipmentF1Repository)
+    public LaboratoryEquipmentF1Service(ILaboratoryEquipmentF1Repository repo)
     {
-      _laboratoryEquipmentF1Repository = laboratoryEquipmentF1Repository;
+      _repo = repo;
     }
 
-    public async Task AddProductAsync(LaboratoryEquipmentF1DTO product)
-    {
-      await _laboratoryEquipmentF1Repository.AddProductAsync(product);
-    }
-
-    public async Task<IEnumerable<Category>> GetCategories()
-    {
-      return await _laboratoryEquipmentF1Repository.GetCategories();
-    }
-
+    public async Task AddProductAsync(LaboratoryEquipmentF1DTO product) => await _repo.AddProductAsync(product);
+    public async Task<IEnumerable<Category>> GetCategories() => await _repo.GetCategories();
     public async Task<IPagedList<LaboratoryEquipmentF1DTO>> GetProducts(int categoryId, int pageNumber, int pageSize)
-    {
-      var products = await _laboratoryEquipmentF1Repository.GetProducts(categoryId);
-      return await products.ToPagedListAsync(pageNumber, pageSize);
-    }
-
-    public async Task DeleteProductAsync(int productId)
-    {
-      await _laboratoryEquipmentF1Repository.DeleteProductAsync(productId);
-    }
-
-    public async Task<LaboratoryEquipmentF1DTO> GetProductByIdAsync(int productId)
-    {
-      return await _laboratoryEquipmentF1Repository.GetProductByIdAsync(productId);
-    }
-
-    public async Task UpdateProductAsync(LaboratoryEquipmentF1DTO product)
-    {
-      await _laboratoryEquipmentF1Repository.UpdateProductAsync(product);
-    }
-
-    public async Task<IEnumerable<LaboratoryEquipmentF1DTO>> SearchProductsByNameAsync(string name, int categoryId)
-    {
-      var products = await _laboratoryEquipmentF1Repository.SearchProductsByNameAsync(name, categoryId);
-      return await products.ToListAsync();
-    }
-
+        => await (await _repo.GetProducts(categoryId)).ToPagedListAsync(pageNumber, pageSize);
+    public async Task DeleteProductAsync(int productId) => await _repo.DeleteProductAsync(productId);
+    public async Task<LaboratoryEquipmentF1DTO> GetProductByIdAsync(int productId) => await _repo.GetProductByIdAsync(productId);
+    public async Task UpdateProductAsync(LaboratoryEquipmentF1DTO product) => await _repo.UpdateProductAsync(product);
     public async Task<IPagedList<LaboratoryEquipmentF1DTO>> SearchProductsByNameAsync(string name, int categoryId, int page, int pageSize)
-    {
-      var products = await _laboratoryEquipmentF1Repository.SearchProductsByNameAsync(name, categoryId);
-      return await products.ToPagedListAsync(page, pageSize);
-    }
+        => await (await _repo.SearchProductsByNameAsync(name, categoryId)).ToPagedListAsync(page, pageSize);
   }
 }

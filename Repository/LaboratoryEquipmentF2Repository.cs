@@ -17,22 +17,19 @@ namespace AspnetCoreMvcFull.Repository
       _context = context;
     }
 
-    public async Task AddProductAsync(LaboratoryEquipmentF2DTO productDTO)
+    public async Task AddProductAsync(LaboratoryEquipmentF2DTO dto)
     {
       var product = new Product
       {
-        name = productDTO.name,
-        image = productDTO.image,
-        CategoryId = productDTO.CategoryId
+        name = dto.name,
+        image = dto.image,
+        CategoryId = dto.CategoryId
       };
       _context.Products.Add(product);
       await _context.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<Category>> GetCategories()
-    {
-      return await _context.Categories.ToListAsync();
-    }
+    public async Task<IEnumerable<Category>> GetCategories() => await _context.Categories.ToListAsync();
 
     public Task<IQueryable<LaboratoryEquipmentF2DTO>> GetProducts(int categoryId)
     {
@@ -72,21 +69,21 @@ namespace AspnetCoreMvcFull.Repository
           .FirstOrDefaultAsync();
     }
 
-    public async Task UpdateProductAsync(LaboratoryEquipmentF2DTO productDTO)
+    public async Task UpdateProductAsync(LaboratoryEquipmentF2DTO dto)
     {
-      var product = await _context.Products.FindAsync(productDTO.ProductId);
+      var product = await _context.Products.FindAsync(dto.ProductId);
       if (product != null)
       {
-        product.name = productDTO.name;
-        product.image = productDTO.image;
-        product.CategoryId = productDTO.CategoryId;
+        product.name = dto.name;
+        product.image = dto.image;
+        product.CategoryId = dto.CategoryId;
         await _context.SaveChangesAsync();
       }
     }
 
     public Task<IQueryable<LaboratoryEquipmentF2DTO>> SearchProductsByNameAsync(string name, int categoryId)
     {
-      var products = _context.Products
+      var query = _context.Products
           .Where(p => p.name.Contains(name) && p.CategoryId == categoryId)
           .Select(p => new LaboratoryEquipmentF2DTO
           {
@@ -95,23 +92,7 @@ namespace AspnetCoreMvcFull.Repository
             image = p.image,
             CategoryId = p.CategoryId
           });
-      return Task.FromResult(products);
-    }
-
-    public async Task<IEnumerable<LaboratoryEquipmentF2DTO>> SearchProductsByNameAsync(string name, int categoryId, int page, int pageSize)
-    {
-      return await _context.Products
-          .Where(p => p.name.Contains(name) && p.CategoryId == categoryId)
-          .Skip((page - 1) * pageSize)
-          .Take(pageSize)
-          .Select(p => new LaboratoryEquipmentF2DTO
-          {
-            ProductId = p.ProductId,
-            name = p.name,
-            image = p.image,
-            CategoryId = p.CategoryId
-          })
-          .ToListAsync();
+      return Task.FromResult(query);
     }
   }
 }

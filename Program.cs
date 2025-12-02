@@ -1,11 +1,12 @@
 using AspnetCoreMvcFull.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
 using AspnetCoreMvcFull.Repositories;
 using AspnetCoreMvcFull.Repository;
 using AspnetCoreMvcFull.Service;
 using AspnetCoreMvcFull.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -47,10 +48,9 @@ builder.Services.AddScoped<IProductLTCTLService, ProductLTCTLService>();
 builder.Services.AddScoped<IProductLTCTLRepository, ProductLTCTLRepository>();
 builder.Services.AddScoped<IQuyCachCSCTLRepository, QuyCachCSCTLRepository>();
 builder.Services.AddScoped<IQuyCachCSCTLService, QuyCachCSCTLService>();
-builder.Services.AddScoped<IProductStandardRepository, ProductStandardRepository>();
-builder.Services.AddScoped<IProductStandardService, ProductStandardService>();
-builder.Services.AddScoped<IRawMaterialStandardRepository, RawMaterialStandardRepository>();
-builder.Services.AddScoped<IRawMaterialStandardService, RawMaterialStandardService>();
+// Product Standard - MHE (CategoryId = 15)
+builder.Services.AddScoped<IProductStandardMHEService, ProductStandardMHEService>();
+builder.Services.AddScoped<IProductStandardMHERepository, ProductStandardMHERepository>();
 builder.Services.AddScoped<ILaboratoryEquipmentF1Repository, LaboratoryEquipmentF1Repository>();
 builder.Services.AddScoped<ILaboratoryEquipmentF1Service, LaboratoryEquipmentF1Service>();
 builder.Services.AddScoped<ILaboratoryEquipmentF2Repository, LaboratoryEquipmentF2Repository>();
@@ -59,8 +59,41 @@ builder.Services.AddScoped<IQCEmployeeF1Repository, QCEmployeeF1Repository>();
 builder.Services.AddScoped<IQCEmployeeF1Service, QCEmployeeF1Service>();
 builder.Services.AddScoped<IQCEmployeeF2Repository, QCEmployeeF2Repository>();
 builder.Services.AddScoped<IQCEmployeeF2Service, QCEmployeeF2Service>();
+builder.Services.AddScoped<ILabCalibrationF1Service, LabCalibrationF1Service>();
+builder.Services.AddScoped<ILabCalibrationF1Repository, LabCalibrationF1Repository>();
+builder.Services.AddScoped<ILabEquipF1DailyCheckService, LabEquipF1DailyCheckService>();
+builder.Services.AddScoped<ILabEquipF1DailyCheckRepository, LabEquipF1DailyCheckRepository>();
+// F2 - Kết quả hiệu chuẩn
+builder.Services.AddScoped<ICalibrationF2Service, CalibrationF2Service>();
+builder.Services.AddScoped<ICalibrationF2Repository, CalibrationF2Repository>();
+
+// F2 - Tiêu chuẩn kiểm tra hằng ngày
+builder.Services.AddScoped<ILabEquipF2DailyCheckService, LabEquipF2DailyCheckService>();
+builder.Services.AddScoped<ILabEquipF2DailyCheckRepository, LabEquipF2DailyCheckRepository>();
+
+// Raw Material Standard - Metal Core
+builder.Services.AddScoped<IRawMaterialMetalCoreService, RawMaterialMetalCoreService>();
+builder.Services.AddScoped<IRawMaterialMetalCoreRepository, RawMaterialMetalCoreRepository>();
+builder.Services.AddScoped<IRawMaterialChemicalService, RawMaterialChemicalService>();
+builder.Services.AddScoped<IRawMaterialChemicalRepository, RawMaterialChemicalRepository>();
+builder.Services.AddScoped<IRawMaterialSteelCordService, RawMaterialSteelCordService>();
+builder.Services.AddScoped<IRawMaterialSteelCordRepository, RawMaterialSteelCordRepository>();
+builder.Services.AddScoped<IRawMaterialFabricService, RawMaterialFabricService>();
+builder.Services.AddScoped<IRawMaterialFabricRepository, RawMaterialFabricRepository>();
+
 
 builder.Services.AddControllersWithViews();
+builder.Services.Configure<RazorViewEngineOptions>(options =>
+{
+  options.ViewLocationFormats.Clear();
+  options.ViewLocationFormats.Add("/Views/ProductQC/{1}/{0}.cshtml"); // {1} = Controller, {0} = Action
+  options.ViewLocationFormats.Add("/Views/ProductQC/{1}/Index.cshtml");
+  options.ViewLocationFormats.Add("/Views/ProductQC/{1}/Create.cshtml");
+  options.ViewLocationFormats.Add("/Views/ProductQC/{1}/Edit.cshtml");
+  options.ViewLocationFormats.Add("/Views/ProductQC/{1}/Show.cshtml");
+  options.ViewLocationFormats.Add("/Views/{1}/{0}.cshtml"); // fallback
+  options.ViewLocationFormats.Add("/Views/Shared/{0}.cshtml");
+});
 builder.Services.AddRazorPages();
 
 //builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();

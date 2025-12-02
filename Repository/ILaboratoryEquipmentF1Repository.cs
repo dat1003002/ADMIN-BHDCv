@@ -15,6 +15,5 @@ namespace AspnetCoreMvcFull.Repository
     Task<LaboratoryEquipmentF1DTO> GetProductByIdAsync(int productId);
     Task UpdateProductAsync(LaboratoryEquipmentF1DTO productDTO);
     Task<IQueryable<LaboratoryEquipmentF1DTO>> SearchProductsByNameAsync(string name, int categoryId);
-    Task<IEnumerable<LaboratoryEquipmentF1DTO>> SearchProductsByNameAsync(string name, int categoryId, int page, int pageSize);
   }
 }

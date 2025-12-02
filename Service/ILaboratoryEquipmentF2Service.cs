@@ -14,7 +14,6 @@ namespace AspnetCoreMvcFull.Service
     Task DeleteProductAsync(int productId);
     Task<LaboratoryEquipmentF2DTO> GetProductByIdAsync(int productId);
     Task UpdateProductAsync(LaboratoryEquipmentF2DTO product);
-    Task<IEnumerable<LaboratoryEquipmentF2DTO>> SearchProductsByNameAsync(string name, int categoryId);
     Task<IPagedList<LaboratoryEquipmentF2DTO>> SearchProductsByNameAsync(string name, int categoryId, int page, int pageSize);
   }
 }
